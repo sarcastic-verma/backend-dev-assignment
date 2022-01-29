@@ -1,4 +1,4 @@
-import {ErrorWithCode} from "../interfaces/errorWithCode";
+import { ErrorWithCode } from "../interfaces/error-with-code";
 
 class RequestError implements ErrorWithCode {
     code: number;
@@ -9,18 +9,18 @@ class RequestError implements ErrorWithCode {
         this.code = errorCode;
         this.message = message;
         // If err is passed, it will be logged on the console
-        if (err) {
+        if ( err ) {
             console.log("\n")
             const currentDate = new Date();
 
             const datetime = currentDate.getDate() + "/"
-                + (currentDate.getMonth() + 1) + "/"
+                + ( currentDate.getMonth() + 1 ) + "/"
                 + currentDate.getFullYear() + " @ "
                 + currentDate.getHours() + ":"
                 + currentDate.getMinutes() + ":"
                 + currentDate.getSeconds();
 
-            console.log(`The following error occurred on ${datetime}:`);
+            console.log(`The following error occurred on ${ datetime }:`);
             console.log(err);
             console.log("error->catch");
             console.log("\n")

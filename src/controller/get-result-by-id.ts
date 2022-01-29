@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { EntityNotFoundError, getManager } from "typeorm";
 import { StudentResult } from "../entity/StudentResult";
-import RequestError from "../middlewares/requestError";
+import RequestError from "../middlewares/request-error";
 
 export async function getResultById(request: Request, response: Response, next: NextFunction) {
     try {

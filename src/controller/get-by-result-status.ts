@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { FindManyOptions, getManager } from "typeorm";
 import { StudentResult } from "../entity/StudentResult";
-import RequestError from "../middlewares/requestError";
+import RequestError from "../middlewares/request-error";
 
 export async function getByResultStatus(request: Request, response: Response, next: NextFunction) {
     try {
@@ -12,9 +12,9 @@ export async function getByResultStatus(request: Request, response: Response, ne
 
         if ( !status ) options = {};
         // todo
-        else if ( status === "passed" ) options = { where: {} };
-        else if ( status === "failed" ) options = { where: {} };
-        else next(new RequestError("Invalid resultStatus", 401));
+        else if ( status === "passed" ) options = {};
+        else if ( status === "failed" ) options = {};
+        else return next(new RequestError("Invalid resultStatus", 400));
 
         const studentResults = await studentResultRepository.find(options);
 
@@ -23,5 +23,4 @@ export async function getByResultStatus(request: Request, response: Response, ne
         const error = new RequestError(e.message || "Error in finding result by status!", 400, e);
         next(error);
     }
-
 }
