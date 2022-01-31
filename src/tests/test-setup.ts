@@ -1,6 +1,7 @@
 import getConnection from "../utils/get-connection";
 import { Application } from "express";
 import app from "../app";
+import { StudentResult } from "../entity/StudentResult";
 
 jest.setTimeout(20_000);
 
@@ -17,6 +18,7 @@ export const describeWithApp = (
     });
 
     afterAll(async() => {
+        await (await conn).getRepository(StudentResult).clear();
         await (await conn).close();
     });
 
