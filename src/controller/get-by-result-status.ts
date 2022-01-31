@@ -11,9 +11,10 @@ export async function getByResultStatus(request: Request, response: Response, ne
         let options: FindManyOptions<StudentResult> = {};
 
         if ( !status ) options = {};
-        // todo
-        else if ( status === "passed" ) options = {};
-        else if ( status === "failed" ) options = {};
+
+        else if ( status ) options = {
+            where: { status: status }
+        }
         else return next(new RequestError("Invalid resultStatus", 400));
 
         const studentResults = await studentResultRepository.find(options);
