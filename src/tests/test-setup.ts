@@ -15,10 +15,10 @@ export const describeWithApp = (
 
     beforeAll(async() => {
         await conn;
+        await (await conn).getRepository(StudentResult).clear();
     });
 
     afterAll(async() => {
-        await (await conn).getRepository(StudentResult).clear();
         await (await conn).close();
     });
 

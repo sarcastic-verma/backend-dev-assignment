@@ -10,25 +10,38 @@ export async function uploadResult(request: Request, response: Response, next: N
     const studentResultRepository = getManager().getRepository(StudentResult);
 
     const values: IStudentResultRow[] = [];
+    let invalidCsv: boolean;
 
-    if ( !request.file ) {
+    const isTest = process.env.NODE_ENV === "test";
+
+    if ( !isTest && !request.file ) {
         const error = new RequestError("Results csv not sent!", 400);
         next(error);
     }
 
-    csv.parseFile(request.file!.path!, { headers: true }).on('data', (row) => {
+    csv.parseFile(isTest ? "./test.csv" : request.file!.path!, { headers: true }).on('data', (row) => {
         const studentResultRow = row as unknown as IStudentResultRow & { status: "passed" | "failed" };
+
+        Object.keys(studentResultRow).forEach((e) => {
+            if ( studentResultRow[e] === '' || ( [ "mark1", "mark2", "mark3" ].includes(e) && isNaN(+studentResultRow[e]) ) )
+                invalidCsv = true
+        })
+
         const { mark1, mark2, mark3 } = studentResultRow;
 
-        studentResultRow.status = mark1 > 35 && mark2 > 35 && mark3 > 35 ? "passed" : "failed";
+        studentResultRow.status = +mark1 > 35 && +mark2 > 35 && +mark3 > 35 ? "passed" : "failed";
 
         values.push(studentResultRow);
     }).on('end', async () => {
         try {
+            if ( invalidCsv )
+                return next(new RequestError("Invalid CSV data", 400));
+
             await studentResultRepository.createQueryBuilder().insert().values(values).execute();
-            fs.unlink(request.file!.path, (err: any) => {
-                console.log(err);
-            });
+            if ( !isTest )
+                fs.unlink(request.file!.path, (err: any) => {
+                    console.log(err);
+                });
             response.json({ message: `Successfully inserted ${ values.length } results!` });
         } catch ( e ) {
             const error = new RequestError(e.message || "Error in creating result!", 500, e);
