@@ -12,9 +12,8 @@ export async function getByResultStatus(request: Request, response: Response, ne
 
         if ( !status ) options = {};
 
-        else if ( status ) options = {
-            where: { status: status }
-        }
+        else if ( [ "passed", "failed" ].includes(status.toString()) ) options = { where: { status: status } }
+
         else return next(new RequestError("Invalid resultStatus", 400));
 
         const studentResults = await studentResultRepository.find(options);
